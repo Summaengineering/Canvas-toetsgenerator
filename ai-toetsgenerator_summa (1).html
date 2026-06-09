@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Toets naar Canvas · plak tekst, download QTI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* === Summa surfaces === */
+    --paper:#F6F6FB; --paper-2:#EEEEF7; --card:#FFFFFF;
+    --ink:#1A1854; --ink-soft:#4A4880; --muted:#7A78A0; --faint:#A8A6C5;
+    --line:#E6E6F0; --line-2:#D5D5E4;
+    /* === Primary = Summa indigo (was teal) === */
+    --teal:#2E2B8F; --teal-deep:#1D1B6B; --teal-soft:#E7E6F5; --teal-tint:#F3F3FB;
+    /* === Secondary = Summa mint (was coral) === */
+    --coral:#77E0D0; --coral-soft:#E8FAF6;
+    /* === Semantic (Summa) === */
+    --amber:#B8862F; --amber-soft:#FDF6E7;
+    --green:#2D8F6B; --green-soft:#E9F7F1;
+    --red:#B8425A; --red-soft:#FBECF0;
+    --blue:#6F4AB8; --blue-soft:#EFEAFA; --purple:#6F4AB8; --purple-soft:#EFEAFA;
+    /* === Fonts === */
+    --sans:'Inter','Manrope',system-ui,-apple-system,sans-serif;
+    --serif:'Manrope','Inter',system-ui,sans-serif;
+    --mono:'JetBrains Mono',ui-monospace,'SF Mono',Consolas,monospace;
+    /* === Shadows (indigo-tinted) === */
+    --sh-sm:0 1px 2px rgba(46,43,143,.05); --sh:0 2px 6px rgba(46,43,143,.06),0 14px 32px -16px rgba(46,43,143,.16);
+    --sh-lg:0 4px 12px rgba(46,43,143,.07),0 24px 48px -18px rgba(46,43,143,.20);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.65;
+    -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;min-height:100vh;letter-spacing:-.005em;
+    background-image:radial-gradient(circle at 12% -5%,rgba(46,43,143,.05),transparent 42%),radial-gradient(circle at 92% 0%,rgba(119,224,208,.10),transparent 40%);
+  }
+  ::selection{background:var(--coral);color:var(--teal-deep)}
+  button{font-family:inherit;cursor:pointer}
+  ::-webkit-scrollbar{width:11px;height:11px}
+  ::-webkit-scrollbar-thumb{background:var(--line-2);border:3px solid var(--paper);border-radius:8px}
+  ::-webkit-scrollbar-thumb:hover{background:var(--faint)}
+
+  /* HEADER */
+  header.top{position:sticky;top:0;z-index:30;backdrop-filter:blur(10px);background:rgba(246,246,251,.82);border-bottom:1px solid var(--line)}
+  .top-in{max-width:1240px;margin:0 auto;height:62px;display:flex;align-items:center;gap:16px;padding:0 24px}
+  .wm{display:flex;align-items:center;gap:11px;text-decoration:none}
+  .wm .mark{width:34px;height:34px;border-radius:10px;background:var(--teal);color:#fff;display:grid;place-items:center;font-family:var(--serif);font-weight:800;font-size:18px;box-shadow:0 4px 12px -3px rgba(46,43,143,.5);transform:none}
+  .wm .wtxt{display:flex;flex-direction:column;line-height:1.05}
+  .wm .wtxt b{font-family:var(--serif);font-weight:700;font-size:18px;letter-spacing:-.02px;color:var(--ink)}
+  .wm .wtxt span{font-size:11px;color:var(--muted);font-weight:500}
+  .top-sp{flex:1}
+  .top-link{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;font-weight:500;color:var(--ink-soft);text-decoration:none;padding:7px 12px;border-radius:9px;border:1px solid transparent;background:none}
+  .top-link:hover{background:var(--card);border-color:var(--line);color:var(--ink)}
+  .top-logo img{height:24px;width:auto;opacity:.9;display:block}
+  .top-logo .lf{font-family:var(--serif);font-weight:700;color:var(--teal);display:none}
+
+  /* HERO */
+  .wrap{max-width:1240px;margin:0 auto;padding:30px 24px 70px}
+  .hero{margin-bottom:24px}
+  .hero h1{font-family:var(--serif);font-weight:800;font-size:40px;line-height:1.08;letter-spacing:-.025em;max-width:20ch}
+  .hero h1 em{font-style:normal;color:var(--teal)}
+  .hero p{margin-top:10px;color:var(--ink-soft);font-size:16px;max-width:64ch}
+  .flow{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap}
+  .flow .pill{display:inline-flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:99px;padding:6px 13px 6px 7px;font-size:13px;font-weight:500;color:var(--ink-soft);box-shadow:var(--sh-sm)}
+  .flow .pill .n{width:21px;height:21px;border-radius:50%;background:var(--teal-soft);color:var(--teal-deep);display:grid;place-items:center;font-weight:700;font-size:12px}
+  .flow .arr{color:var(--faint);align-self:center}
+
+  /* LAYOUT */
+  .grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:start}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--sh)}
+  .card-h{display:flex;align-items:center;gap:11px;padding:18px 22px;border-bottom:1px solid var(--line)}
+  .card-h .step{width:26px;height:26px;border-radius:8px;background:var(--ink);color:var(--paper);display:grid;place-items:center;font-weight:700;font-size:13px;flex:0 0 auto}
+  .card-h h2{font-family:var(--serif);font-weight:700;font-size:19px;letter-spacing:-.2px}
+  .card-h .right{margin-left:auto;display:flex;align-items:center;gap:8px}
+
+  /* LEFT: paste */
+  .paste-body{padding:18px 20px 20px;display:flex;flex-direction:column}
+  .ta-wrap{position:relative}
+  textarea#src{width:100%;min-height:430px;border:1px solid var(--line-2);background:var(--paper);border-radius:13px;padding:16px 18px;font-family:var(--mono);font-size:14px;line-height:1.75;color:var(--ink);resize:vertical;outline:none;tab-size:2}
+  textarea#src:focus{border-color:var(--teal);background:#fff;box-shadow:0 0 0 3px var(--teal-tint)}
+  textarea#src::placeholder{color:var(--faint)}
+  .ta-foot{display:flex;align-items:center;gap:10px;margin-top:13px;flex-wrap:wrap}
+  .mini-btn{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line-2);background:var(--card);border-radius:10px;padding:8px 13px;font-size:13px;font-weight:600;color:var(--ink-soft);transition:.13s}
+  .mini-btn:hover{border-color:var(--teal);color:var(--teal-deep);background:var(--teal-tint)}
+  .mini-btn.ghost{border-color:transparent;background:transparent}
+  .mini-btn.ghost:hover{background:var(--paper-2);color:var(--ink)}
+  .ta-foot .sp{flex:1}
+  .ex-wrap{position:relative}
+  .ex-menu{position:absolute;bottom:calc(100% + 6px);left:0;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--sh-lg);padding:6px;min-width:210px;display:none;z-index:10}
+  .ex-menu.show{display:block;animation:pop .14s}
+  .ex-menu button{display:flex;width:100%;align-items:center;gap:10px;border:none;background:none;padding:9px 11px;border-radius:9px;font-size:13.5px;font-weight:600;color:var(--ink-soft);text-align:left}
+  .ex-menu button:hover{background:var(--teal-tint);color:var(--teal-deep)}
+
+  /* RIGHT: results */
+  .res-h .vbadge{display:none;align-items:center;gap:7px;font-size:12.5px;font-weight:700;padding:5px 11px;border-radius:99px}
+  .res-h .vbadge.ok{background:var(--green-soft);color:#1f6b4f;display:inline-flex}
+  .res-h .vbadge.bad{background:var(--red-soft);color:var(--red);display:inline-flex}
+  .res-body{padding:22px;min-height:430px}
+
+  .empty{text-align:center;padding:30px 14px 36px}
+  .empty .ill{width:88px;height:88px;margin:0 auto 18px;border-radius:24px;background:linear-gradient(140deg,var(--teal-soft),var(--coral-soft));display:grid;place-items:center;font-size:38px;transform:rotate(-2deg);box-shadow:var(--sh)}
+  .empty h3{font-family:var(--serif);font-weight:700;font-size:21px;margin-bottom:7px}
+  .empty p{color:var(--ink-soft);max-width:44ch;margin:0 auto 18px}
+  .empty .demo-b{border:1px solid var(--line-2);background:var(--card);border-radius:11px;padding:9px 16px;font-size:13.5px;font-weight:600;color:var(--ink-soft);display:inline-flex;gap:7px;align-items:center}
+  .empty .demo-b:hover{border-color:var(--teal);color:var(--teal-deep);background:var(--teal-tint)}
+
+  .ov-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+  .ov-meta .tcount{background:var(--ink);color:var(--paper);padding:4px 11px;border-radius:99px;font-weight:700;font-size:12.5px}
+  .typetag{padding:3px 9px;border-radius:99px;font-size:11.5px;font-weight:600}
+  .qtitle{font-family:var(--serif);font-weight:700;font-size:20px;margin-bottom:2px}
+  .qdesc{color:var(--ink-soft);margin-bottom:14px;font-size:14px}
+
+  .warns{margin-bottom:16px;border-radius:12px;overflow:hidden;border:1px solid var(--amber-soft)}
+  .warns.errs{border-color:var(--red-soft)}
+  .warns .wh{background:var(--amber-soft);color:#8a6518;padding:8px 13px;font-size:12.5px;font-weight:700}
+  .warns.errs .wh{background:var(--red-soft);color:var(--red)}
+  .warnline{padding:7px 13px;font-size:12.5px;border-top:1px solid #f4ead0;display:flex;gap:9px}
+  .warns.errs .warnline{border-top-color:#f0d4d9}
+  .warnline.err{color:var(--red)} .warnline.warn{color:#946200}
+
+  .qc{border:1px solid var(--line);border-radius:14px;margin-bottom:13px;overflow:hidden;background:#fff;animation:qpop .35s cubic-bezier(.2,.7,.3,1) backwards}
+  .qc.invalid{border-color:var(--red-soft)}
+  .qc-h{display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid var(--line);background:var(--paper)}
+  .qc-h .qn{width:25px;height:25px;border-radius:8px;background:var(--card);border:1px solid var(--line-2);display:grid;place-items:center;font-weight:700;font-size:12.5px;color:var(--ink-soft);flex:0 0 auto}
+  .qc-h .qtype{font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:99px}
+  .qc-h .qstatus{margin-left:auto;font-size:11.5px;font-weight:600}
+  .qc-h .qstatus.ok{color:var(--green)} .qc-h .qstatus.bad{color:var(--red)}
+  .qc-b{padding:13px 16px}
+  .qtext{font-size:15px;font-weight:500;line-height:1.5;margin-bottom:10px}
+  .opts{list-style:none;display:flex;flex-direction:column;gap:6px}
+  .opts li{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:var(--ink-soft);padding:6px 11px;border-radius:9px;background:var(--paper)}
+  .opts li.cor{background:var(--green-soft);color:#1d6c3c;font-weight:600}
+  .opts li .ob{width:19px;height:19px;border-radius:6px;border:1.5px solid var(--line-2);flex:0 0 auto;display:grid;place-items:center;font-size:11px;color:transparent;margin-top:1px}
+  .opts li.cor .ob{background:var(--green);border-color:var(--green);color:#fff}
+  .opts li.radio .ob{border-radius:50%}
+  .ansline{font-size:13.5px;background:var(--paper);border-radius:9px;padding:9px 12px;display:flex;gap:9px;align-items:center}
+  .ansline .lbl{font-weight:600;color:var(--muted)}
+  .ansline .val{font-weight:600;color:var(--teal-deep)}
+  .ansline.muted .val{color:var(--ink-soft);font-weight:500}
+
+  .export{margin-top:18px;border:1px solid var(--teal-soft);background:var(--teal-tint);border-radius:16px;padding:18px}
+  .export h3{font-family:var(--serif);font-weight:700;font-size:18px;display:flex;align-items:center;gap:9px}
+  .export p{font-size:13.5px;color:var(--ink-soft);margin:4px 0 14px}
+  .export .row{display:flex;gap:11px;flex-wrap:wrap}
+  .dl-zip{flex:1;min-width:210px;border:none;background:var(--teal);color:#fff;border-radius:12px;padding:14px;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 6px 16px -6px rgba(46,43,143,.6);transition:.15s}
+  .dl-zip:hover{background:var(--teal-deep);transform:translateY(-1px)}
+  .dl-zip:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+  .dl-txt{border:1px solid var(--line-2);background:#fff;border-radius:12px;padding:14px 16px;font-size:13.5px;font-weight:600;color:var(--ink-soft);display:inline-flex;align-items:center;gap:8px}
+  .dl-txt:hover{border-color:var(--teal);color:var(--teal-deep)}
+  details.howto{margin-top:14px;border-top:1px solid var(--teal-soft);padding-top:12px}
+  details.howto summary{font-size:13.5px;font-weight:600;color:var(--teal-deep);cursor:pointer;list-style:none;display:flex;align-items:center;gap:7px}
+  details.howto summary::-webkit-details-marker{display:none}
+  details.howto summary .tw{transition:.2s}
+  details.howto[open] summary .tw{transform:rotate(90deg)}
+  details.howto ol{margin:11px 0 0 4px;padding-left:20px;font-size:13.5px;color:var(--ink-soft);line-height:1.75}
+  details.howto code{background:#fff;border:1px solid var(--teal-soft);border-radius:6px;padding:1px 6px;font-size:12.5px;font-weight:600;color:var(--teal-deep)}
+
+  /* EXPLAINER */
+  .explainer{margin-top:46px}
+  .explainer .eh{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+  .explainer h2{font-family:var(--serif);font-weight:700;font-size:26px;letter-spacing:-.3px}
+  .explainer .esub{color:var(--ink-soft);font-size:15px;margin-bottom:20px;max-width:70ch}
+  .explainer .esub a{color:var(--teal-deep);font-weight:600;cursor:pointer}
+  .ex-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(258px,1fr));gap:18px}
+  .ex-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:var(--sh)}
+  .ex-card .ech{display:flex;align-items:center;gap:9px;margin-bottom:10px}
+  .ex-card .ico{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-size:15px;flex:0 0 auto}
+  .ex-card h3{font-family:var(--serif);font-weight:700;font-size:17px}
+  .ex-card .lead{font-size:13.5px;color:var(--ink-soft);line-height:1.55;margin-bottom:13px}
+  .ex-code{background:var(--paper);border:1px solid var(--line);border-radius:11px;padding:13px 14px;font-family:var(--mono);font-size:13px;line-height:1.7;color:var(--ink);white-space:pre-wrap;overflow-x:auto}
+  .ex-code .star{color:var(--coral);font-weight:700;background:var(--coral-soft);border-radius:4px;padding:0 3px}
+  .ex-code .key{color:var(--teal-deep);font-weight:700}
+  .ex-card .note{display:flex;gap:8px;align-items:flex-start;margin-top:13px;font-size:12.5px;color:var(--ink-soft);background:var(--teal-tint);border:1px solid var(--teal-soft);border-radius:10px;padding:9px 11px}
+  .ex-card .note b{color:var(--teal-deep)}
+  .ex-card .note .ni{color:var(--teal);flex:0 0 auto}
+
+  /* FOOTER */
+  .foot{max-width:1240px;margin:50px auto 0;padding:0 24px}
+  .foot-card{background:var(--ink);color:var(--paper);border-radius:20px;padding:30px 34px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;box-shadow:var(--sh-lg)}
+  .foot-card .ft{flex:1;min-width:260px}
+  .foot-card h3{font-family:var(--serif);font-weight:700;font-size:23px}
+  .foot-card p{color:#b8b6d8;font-size:14.5px;margin-top:6px;max-width:54ch}
+  .foot-cta{display:inline-flex;align-items:center;gap:10px;background:var(--coral);color:var(--teal-deep);text-decoration:none;border-radius:13px;padding:14px 22px;font-size:15px;font-weight:700;box-shadow:0 8px 20px -8px rgba(119,224,208,.8);transition:.15s;white-space:nowrap}
+  .foot-cta:hover{transform:translateY(-2px)}
+  .foot-fine{text-align:center;color:var(--muted);font-size:12.5px;margin-top:22px}
+
+  /* toast */
+  .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(18px);background:var(--ink);color:#fff;font-size:14px;font-weight:600;padding:12px 20px;border-radius:13px;z-index:80;opacity:0;pointer-events:none;transition:.28s;display:flex;align-items:center;gap:10px;box-shadow:var(--sh-lg)}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .toast .tk{color:#77E0D0}
+
+  /* rules modal */
+  .ov-mask{position:fixed;inset:0;background:rgba(26,24,84,.42);backdrop-filter:blur(4px);z-index:90;display:none;align-items:flex-start;justify-content:center;padding:6vh 20px}
+  .ov-mask.show{display:flex;animation:fade .15s}
+  .modal{background:var(--card);border-radius:18px;max-width:680px;width:100%;max-height:84vh;display:flex;flex-direction:column;box-shadow:var(--sh-lg);animation:qpop .25s cubic-bezier(.2,.7,.3,1)}
+  .modal-h{display:flex;align-items:center;gap:12px;padding:18px 22px;border-bottom:1px solid var(--line)}
+  .modal-h h3{font-family:var(--serif);font-weight:700;font-size:19px}
+  .modal-h .mx{margin-left:auto;border:none;background:var(--paper-2);width:32px;height:32px;border-radius:9px;font-size:17px;color:var(--ink-soft)}
+  .modal-h .mx:hover{background:var(--line)}
+  .modal-b{overflow:auto;padding:20px 22px}
+  .modal-b pre{white-space:pre-wrap;font-family:var(--mono);font-size:13px;line-height:1.65;color:var(--ink-soft);background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px}
+  .modal-f{padding:14px 22px;border-top:1px solid var(--line);display:flex;gap:10px;align-items:center}
+  .modal-f .cp{border:none;background:var(--teal);color:#fff;border-radius:10px;padding:10px 16px;font-size:13.5px;font-weight:700;display:inline-flex;gap:8px;align-items:center}
+  .modal-f span{font-size:12px;color:var(--muted)}
+
+  @keyframes qpop{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  @keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  /* smart toggle row */
+  .smart-row{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+  .switch{display:inline-flex;align-items:center;gap:10px;cursor:pointer;user-select:none;background:var(--teal-tint);border:1px solid var(--teal-soft);border-radius:12px;padding:8px 13px}
+  .switch input{display:none}
+  .switch .track{width:38px;height:21px;border-radius:99px;background:var(--line-2);position:relative;transition:.18s;flex:0 0 auto}
+  .switch .track::after{content:"";position:absolute;top:2px;left:2px;width:17px;height:17px;border-radius:50%;background:#fff;box-shadow:var(--sh-sm);transition:.18s}
+  .switch input:checked + .track{background:var(--teal)}
+  .switch input:checked + .track::after{transform:translateX(17px)}
+  .switch .lbl{display:flex;flex-direction:column;line-height:1.2}
+  .switch .lbl b{font-size:13px;font-weight:700;color:var(--ink)}
+  .switch .lbl span{font-size:11.5px;color:var(--muted)}
+
+  /* cleaned-up panel in results */
+  .cleaned{margin-bottom:16px;border:1px solid var(--blue-soft);border-radius:13px;overflow:hidden;background:var(--blue-soft)}
+  .cleaned summary{cursor:pointer;list-style:none;padding:10px 14px;font-size:12.8px;font-weight:700;color:var(--blue);display:flex;align-items:center;gap:8px}
+  .cleaned summary::-webkit-details-marker{display:none}
+  .cleaned summary .tw{transition:.2s}
+  .cleaned[open] summary .tw{transform:rotate(90deg)}
+  .cleaned .cb{background:#fff;border-top:1px solid var(--blue-soft);padding:13px 14px}
+  .cleaned pre{white-space:pre-wrap;font-family:var(--mono);font-size:12.5px;line-height:1.6;color:var(--ink);max-height:260px;overflow:auto}
+  .cleaned .crow{display:flex;gap:9px;flex-wrap:wrap;margin-top:11px}
+  .cleaned .cbtn{border:1px solid var(--line-2);background:#fff;border-radius:9px;padding:7px 12px;font-size:12.5px;font-weight:600;color:var(--ink-soft)}
+  .cleaned .cbtn:hover{border-color:var(--teal);color:var(--teal-deep);background:var(--teal-tint)}
+  .cleaned .cbtn.prim{border-color:var(--teal);background:var(--teal-tint);color:var(--teal-deep)}
+
+  /* AI prompt modal */
+  .modal-b .promptbox{white-space:pre-wrap;font-family:var(--mono);font-size:12.5px;line-height:1.6;color:var(--ink-soft);background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px;max-height:46vh;overflow:auto}
+  .modal-b .phint{font-size:13px;color:var(--ink-soft);margin-bottom:13px;line-height:1.55}
+  .modal-b .phint b{color:var(--ink)}
+
+  /* video uitleg modal */
+  .modal.vidmodal{max-width:760px}
+  .vid-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .vid-card{display:flex;flex-direction:column;gap:9px}
+  .vid-thumb{position:relative;width:100%;aspect-ratio:16/9;border:1px solid var(--line);border-radius:12px;background-color:var(--paper-2);background-size:cover;background-position:center;cursor:pointer;overflow:hidden;padding:0;display:block;transition:.15s}
+  .vid-thumb:hover{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-tint)}
+  .vid-thumb::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(26,24,84,.04),rgba(26,24,84,.34));z-index:1}
+  .vid-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:54px;height:54px;border-radius:50%;background:var(--teal);color:#fff;display:grid;place-items:center;font-size:19px;padding-left:3px;box-shadow:0 6px 18px -4px rgba(46,43,143,.6);z-index:2;transition:.15s}
+  .vid-thumb:hover .vid-play{transform:translate(-50%,-50%) scale(1.08);background:var(--teal-deep)}
+  .vid-frame{width:100%;aspect-ratio:16/9;border:none;border-radius:12px;display:block;background:#000}
+  .vid-meta{display:flex;flex-direction:column;gap:2px}
+  .vid-title{font-family:var(--serif);font-weight:700;font-size:14.5px;color:var(--ink);line-height:1.3}
+  .vid-link{font-size:12.5px;font-weight:600;color:var(--teal-deep);text-decoration:none;width:fit-content}
+  .vid-link:hover{text-decoration:underline}
+  @media(max-width:620px){ .vid-grid{grid-template-columns:1fr} }
+
+  @media(max-width:920px){
+    .grid{grid-template-columns:1fr}
+    .hero h1{font-size:30px}
+    textarea#src{min-height:300px}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-in">
+    <a class="wm" href="./">
+      <span class="mark">T</span>
+      <span class="wtxt"><b>Toetsgenerator</b><span>plak tekst → Canvas QTI</span></span>
+    </a>
+    <div class="top-sp"></div>
+    <button class="top-link" id="vidBtn">📹 Video-uitleg</button>
+    <button class="top-link" id="aiBtn">🤖 AI-prompt</button>
+    <button class="top-link" id="rulesBtn">📑 Opmaakregels</button>
+    <a class="top-link" href="./">← Voorbeelden</a>
+    <a class="top-logo" href="./" title="Onderwijs Digitaliseren">
+      <img src="../logo.png" alt="logo" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
+      <span class="lf">◆</span>
+    </a>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section class="hero">
+    <h1>Plak je toets, download een <em>Canvas-bestand</em>.</h1>
+    <p>Plak je vragen — netjes in Canvas-opmaak óf gewoon zoals ze in je document staan. De tool herkent vrije opmaak (meerkeuze met letters, bolletjes, vinkjes, antwoordsleutel…) en zet alles om naar een net QTI-bestand dat je in Canvas importeert. Geen API-key, geen account.</p>
+    <div class="flow">
+      <span class="pill"><span class="n">1</span> Tekst plakken</span><span class="arr">→</span>
+      <span class="pill"><span class="n">2</span> Controleren</span><span class="arr">→</span>
+      <span class="pill"><span class="n">3</span> QTI downloaden</span>
+    </div>
+  </section>
+
+  <div class="grid">
+
+    <!-- LEFT: paste -->
+    <section class="card">
+      <div class="card-h">
+        <span class="step">1</span><h2>Plak je toetstekst</h2>
+        <div class="right"><button class="mini-btn ghost" id="rulesBtn2">📑 opmaak</button></div>
+      </div>
+      <div class="paste-body">
+        <div class="smart-row">
+          <label class="switch" title="Herken vrije opmaak en zet automatisch om">
+            <input type="checkbox" id="smartTog" checked>
+            <span class="track"></span>
+            <span class="lbl"><b>🪄 Slimme herkenning</b><span>plak rommelige / vrije opmaak</span></span>
+          </label>
+          <button class="mini-btn ghost" id="aiBtn2">🤖 Laat AI mijn tekst opmaken</button>
+        </div>
+        <div class="ta-wrap">
+          <textarea id="src" spellcheck="false" placeholder="Quiz title: Mijn toets
+Quiz description: Korte omschrijving
+
+1. Wat is de hoofdstad van Nederland?
+a) Rotterdam
+b) Den Haag
+*c) Amsterdam
+d) Utrecht
+
+2. Noem de hoofdstad van Frankrijk.
+* Parijs
+* Paris
+
+…plak hier je eigen vragen in de Canvas-opmaak"></textarea>
+        </div>
+        <div class="ta-foot">
+          <div class="ex-wrap">
+            <button class="mini-btn" id="exBtn">📋 Voorbeeld laden ▾</button>
+            <div class="ex-menu" id="exMenu">
+              <button data-ex="gemengd">🧩 Gemengd (alle types)</button>
+              <button data-ex="rommel">🪄 Rommelige / vrije opmaak</button>
+              <button data-ex="bio">🌱 Biologie · Fotosynthese</button>
+              <button data-ex="rek">🔢 Rekenen · numeriek</button>
+            </div>
+          </div>
+          <button class="mini-btn ghost" id="clearBtn">✕ Wissen</button>
+          <div class="sp"></div>
+          <span style="font-size:12.5px;color:var(--muted)" id="srcStat"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT: result -->
+    <section class="card">
+      <div class="card-h res-h">
+        <span class="step">2</span><h2>Controle &amp; export</h2>
+        <div class="right"><span class="vbadge" id="vBadge"></span></div>
+      </div>
+      <div class="res-body" id="resBody"></div>
+    </section>
+
+  </div>
+
+  <!-- EXPLAINER -->
+  <section class="explainer">
+    <div class="eh"><h2>Zo schrijf je een vraag</h2></div>
+    <p class="esub">Elke vraag begint met een nummer en een punt: <code style="background:var(--paper-2);border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-family:var(--mono);font-size:13px">1. Vraagtekst?</code>. Daaronder zet je de antwoorden volgens het type. Hieronder de drie meestgebruikte — de volledige lijst staat onder <a id="rulesBtn3">📑 Opmaakregels</a>.</p>
+    <div class="ex-cards">
+
+      <div class="ex-card">
+        <div class="ech"><span class="ico" style="background:var(--teal-soft);color:var(--teal-deep)">◉</span><h3>Meerkeuze</h3></div>
+        <p class="lead">Eén juist antwoord. De opties beginnen met kleine letters <b>a) b) c) d)</b>. Zet een sterretje <b>*</b> vlak vóór de letter van het juiste antwoord.</p>
+        <div class="ex-code">1. Wat is de hoofdstad van Nederland?
+a) Rotterdam
+b) Den Haag
+<span class="star">*</span>c) Amsterdam
+d) Utrecht</div>
+        <div class="note"><span class="ni">✓</span><span>Precies <b>één</b> antwoord krijgt een <b>*</b>. Wil je meerdere juiste antwoorden? Gebruik dan <b>[*]</b> en <b>[ ]</b> per regel.</span></div>
+      </div>
+
+      <div class="ex-card">
+        <div class="ech"><span class="ico" style="background:var(--purple-soft);color:var(--purple)">✎</span><h3>Open vraag</h3></div>
+        <p class="lead">Een kort antwoord dat de student zelf typt. Zet vóór elk goed antwoord een sterretje <b>met een spatie</b>: <b>*&nbsp;antwoord</b>.</p>
+        <div class="ex-code">2. Wat is de hoofdstad van Frankrijk?
+<span class="star">* </span>Parijs
+<span class="star">* </span>Paris</div>
+        <div class="note"><span class="ni">✓</span><span>Je mag <b>meerdere</b> goede antwoorden opgeven (bijv. spellingsvarianten). Elk goed antwoord op een eigen regel met <b>*&nbsp;</b> ervoor.</span></div>
+      </div>
+
+      <div class="ex-card">
+        <div class="ech"><span class="ico" style="background:var(--green-soft);color:#1f6b4f">⊻</span><h3>Waar / Onwaar</h3></div>
+        <p class="lead">Precies twee opties: <b>a) Waar</b> en <b>b) Onwaar</b>. Zet een sterretje <b>*</b> vóór het juiste antwoord.</p>
+        <div class="ex-code">3. Water kookt bij 100 °C op zeeniveau.
+<span class="star">*</span>a) Waar
+b) Onwaar</div>
+        <div class="note"><span class="ni">✓</span><span>Is de stelling onwaar? Dan zet je de <b>*</b> bij <b>b) Onwaar</b>. Gebruik altijd exact deze twee opties.</span></div>
+      </div>
+
+    </div>
+  </section>
+</div>
+
+<div class="foot">
+  <div class="foot-card">
+    <div class="ft">
+      <h3>Dit gekoppeld aan jullie eigen leeromgeving?</h3>
+      <p>We bouwen dit soort tools graag op maat in voor jouw opleiding — van vraagformaten tot een directe koppeling met Canvas.</p>
+    </div>
+    <a class="foot-cta" href="https://wa.me/31645646346?text=Hoi%2C%20ik%20wil%20praten%20over%20de%20toets-naar-QTI%20tool." target="_blank" rel="noopener">💬 Neem contact op</a>
+  </div>
+  <div class="foot-fine">Onderwijs Digitaliseren · voorbeeldtool · QTI 1.2 voor Canvas</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- rules modal -->
+<div class="ov-mask" id="rulesMask">
+  <div class="modal">
+    <div class="modal-h"><h3>📑 Canvas-opmaakregels</h3><button class="mx" id="rulesX">×</button></div>
+    <div class="modal-b"><pre id="rulesPre"></pre></div>
+    <div class="modal-f"><button class="cp" id="rulesCopy">⧉ Kopieer regels</button><span>Volg deze opmaak in je tekst, dan zet de tool alles foutloos om.</span></div>
+  </div>
+</div>
+
+<!-- AI prompt modal -->
+<div class="ov-mask" id="aiMask">
+  <div class="modal">
+    <div class="modal-h"><h3>🤖 Laat AI je tekst opmaken</h3><button class="mx" id="aiX">×</button></div>
+    <div class="modal-b">
+      <p class="phint">Heb je losse, rommelige toetsvragen? Kopieer de prompt hieronder, plak hem in <b>ChatGPT, Claude, Gemini, Copilot</b> (of een andere AI) en plak daaronder je eigen vragen. De AI geeft je nette tekst terug die je hier weer inplakt. <b>De slimme herkenning</b> in deze tool vangt veel varianten al automatisch op — deze prompt is handig bij heel afwijkende of onvolledige tekst (bijv. zonder gemarkeerde antwoorden).</p>
+      <div class="promptbox" id="aiPromptBox"></div>
+    </div>
+    <div class="modal-f"><button class="cp" id="aiCopy">⧉ Kopieer prompt</button><span>Plak hierna je eigen vragen onder de prompt.</span></div>
+  </div>
+</div>
+
+<!-- video uitleg modal -->
+<div class="ov-mask" id="vidMask">
+  <div class="modal vidmodal">
+    <div class="modal-h"><h3>📹 Video-uitleg</h3><button class="mx" id="vidX">×</button></div>
+    <div class="modal-b">
+      <p class="phint">Korte uitleg over het gebruik van de tool. Klik op een video om hem hier af te spelen, of open hem op YouTube.</p>
+      <div class="vid-grid" id="vidGrid"></div>
+    </div>
+    <div class="modal-f"><span>Tip: elke video kun je ook los openen op YouTube via de link eronder.</span></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* ====================== CANVAS RULES (reference) ====================== */
+const RULES =
+`Begin altijd met:
+Quiz title: <titel>
+Quiz description: <omschrijving>
+Daarna direct de vragen. Gebruik uitsluitend platte tekst.
+
+VRAAGTYPEN
+
+1. Meerkeuze (1 juist antwoord)
+1. Vraag?
+a) Antwoord
+*b) Correct antwoord
+c) Antwoord
+d) Antwoord
+- a), b), c), d) in kleine letters.
+- Exact één antwoord krijgt een *.
+
+2. Meerdere juiste antwoorden
+1. Vraag?
+[*] Correct antwoord
+[ ] Fout antwoord
+[*] Correct antwoord
+[ ] Fout antwoord
+
+3. Numeriek
+Exact:        = 5
+Tolerantie:   = 1.4142 +- 0.0001
+Bereik:       = [1.2598,1.2600]
+
+4. Open vraag (Short Answer)
+1. Vraag?
+* Correct antwoord
+(meerdere * regels toegestaan)
+
+5. Essay
+1. Vraag?
+____   (vier underscores)
+
+6. Bestandsupload
+1. Vraag?
+^^^^   (vier carets)
+
+7. Waar/Onwaar
+1. Vraag?
+*a) Waar
+b) Onwaar
+
+NUMMERING
+- Nummer alle vragen doorlopend, formaat: "1. Vraagtekst".`;
+
+/* ====================== AI PROMPT (for users to copy) ====================== */
+const AI_PROMPT =
+`Je bent een assistent die ruwe toetsvragen omzet naar een vast, machine-leesbaar tekstformaat. Hieronder staan mijn vragen in willekeurige opmaak. Zet ze om naar EXACT onderstaand formaat en geef ALLEEN de omgezette tekst terug (geen uitleg, geen markdown, geen codeblok).
+
+REGELS:
+- Begin met:
+  Quiz title: <korte titel>
+  Quiz description: <korte omschrijving>
+  (laat een lege regel, dan de vragen)
+- Nummer elke vraag doorlopend: "1. Vraagtekst?"
+- Laat een lege regel tussen vragen.
+
+VRAAGTYPEN (kies het juiste per vraag):
+
+1) Meerkeuze, één juist antwoord — gebruik kleine letters a) b) c) d) en zet een * vlak vóór de letter van het juiste antwoord:
+1. Wat is de hoofdstad van Nederland?
+a) Rotterdam
+b) Den Haag
+*c) Amsterdam
+d) Utrecht
+
+2) Meerkeuze, meerdere juiste antwoorden — gebruik [*] voor goed en [ ] voor fout:
+1. Welke zijn planeten?
+[*] Aarde
+[ ] De Zon
+[*] Mars
+
+3) Waar/Onwaar — precies twee opties a) Waar en b) Onwaar, * vóór het juiste:
+1. Water kookt bij 100 °C op zeeniveau.
+*a) Waar
+b) Onwaar
+
+4) Open vraag (kort antwoord) — zet * met een spatie vóór elk geaccepteerd antwoord (varianten mogen):
+1. Wat is de hoofdstad van Frankrijk?
+* Parijs
+* Paris
+
+5) Numeriek — regel die begint met = :
+   exact:        = 5
+   met marge:    = 3.14 +- 0.01
+   bereik:       = [1.25,1.26]
+
+6) Essay (lang open antwoord) — zet op een eigen regel vier underscores:
+1. Leg het broeikaseffect uit.
+____
+
+7) Bestandsupload — zet op een eigen regel vier dakjes:
+1. Upload je uitwerking.
+^^^^
+
+BELANGRIJK:
+- Gebruik decimale punten (3.14), geen komma's.
+- Markeer altijd het/de juiste antwoord(en). Weet je het juiste antwoord niet zeker? Kies dan het meest waarschijnlijke en markeer dat.
+- Gebruik uitsluitend platte tekst, geen vet/cursief, geen opsommingstekens behalve de tekens hierboven.
+
+Hier zijn mijn vragen:
+<<< PLAK HIER JE EIGEN VRAGEN >>>`;
+
+/* ====================== EXAMPLES ====================== */
+const EXAMPLES={
+  gemengd:`Quiz title: Demo - Gemengde toets
+Quiz description: Voorbeeldtoets met alle ondersteunde vraagtypen.
+
+1. Wat is de hoofdstad van Nederland?
+a) Rotterdam
+b) Den Haag
+*c) Amsterdam
+d) Utrecht
+
+2. Welke van de volgende zijn planeten?
+[ ] De Zon
+[*] Aarde
+[*] Mars
+[ ] De Maan
+
+3. Wat is 2 + 3?
+= 5
+
+4. Bereken de wortel van 2.
+= 1.4142 +- 0.0001
+
+5. Wat is de hoofdstad van Frankrijk?
+* Parijs
+* Paris
+
+6. Beschrijf in eigen woorden het broeikaseffect.
+____
+
+7. Upload je uitwerking als bestand.
+^^^^
+
+8. Water kookt bij 100 graden Celsius op zeeniveau.
+*a) Waar
+b) Onwaar`,
+  bio:`Quiz title: Biologie - Fotosynthese
+Quiz description: Toets over het proces van fotosynthese.
+
+1. Welke stof nemen planten uit de lucht op voor de fotosynthese?
+a) zuurstof
+*b) koolstofdioxide
+c) stikstof
+d) waterstof
+
+2. Welke producten ontstaan bij de fotosynthese?
+[*] glucose
+[*] zuurstof
+[ ] koolstofdioxide
+[ ] stikstof
+
+3. Fotosynthese heeft licht nodig om plaats te kunnen vinden.
+*a) Waar
+b) Onwaar
+
+4. Hoe heet de groene kleurstof die het licht opvangt?
+* chlorofyl
+* bladgroen
+
+5. Leg uit waarom planten overdag netto zuurstof produceren.
+____`,
+  rek:`Quiz title: Rekenen - Basis
+Quiz description: Numerieke vragen met exact antwoord, tolerantie en bereik.
+
+1. Wat is 12 x 8?
+= 96
+
+2. Wat is pi afgerond op twee decimalen?
+= 3.14 +- 0.01
+
+3. Wat is de derdemachtswortel van 2?
+= [1.2598,1.2600]
+
+4. Een rechthoek is 4 bij 6 cm. Wat is de oppervlakte in cm2?
+a) 10
+b) 20
+*c) 24
+d) 12`,
+  rommel:`Toets: Aardrijkskunde
+Beschrijving: Voorbeeld van vrije / rommelige opmaak die de tool zelf opschoont.
+
+Vraag 1: Wat is de hoofdstad van Italië?
+- Milaan
+- Rome ✓
+- Napels
+- Turijn
+
+2) Welke van deze landen liggen in Europa? (meerdere goed)
+[x] Frankrijk
+[ ] Brazilië
+[x] Polen
+[ ] Japan
+
+3. De Mont Blanc is de hoogste berg van de Alpen.
+○ Waar
+● Onwaar
+
+4) Hoeveel inwoners heeft Nederland ongeveer (in miljoen)?
+Antwoord: 17.5 +- 1
+
+5. Noem een rivier die door Duitsland stroomt.
+* Rijn
+* Donau
+
+6) In welk land staat de Eiffeltoren?
+A. Spanje
+B. Frankrijk
+C. België
+D. Duitsland
+Correct antwoord: B`
+};
+
+/* ====================== ENGINE (verified) ====================== */
+const TYPE_LABEL={multiple_choice:"Meerkeuze",multiple_answers:"Meerdere juist",true_false:"Waar/Onwaar",numerical:"Numeriek",short_answer:"Open antwoord",essay:"Essay",file_upload:"Bestandsupload",unknown:"Onbekend"};
+const TYPE_COLOR={
+  multiple_choice:["var(--teal-soft)","var(--teal-deep)"],multiple_answers:["var(--blue-soft)","var(--blue)"],
+  true_false:["var(--green-soft)","#1f6b4f"],numerical:["var(--amber-soft)","#8a6518"],
+  short_answer:["var(--purple-soft)","var(--purple)"],essay:["var(--paper-2)","var(--ink-soft)"],
+  file_upload:["var(--coral-soft)","var(--coral)"],unknown:["var(--red-soft)","var(--red)"]
+};
+function parseNumeric(s){
+  s=(s||"").trim();let m;
+  if(m=s.match(/^\[\s*(-?[\d.]+)\s*,\s*(-?[\d.]+)\s*\]$/))return {min:+m[1],max:+m[2],kind:"range",display:s};
+  if((m=s.match(/^(-?[\d.]+)\s*\+-\s*(-?[\d.]+)$/))||(m=s.match(/^(-?[\d.]+)\s*\u00b1\s*(-?[\d.]+)$/)))return {exact:+m[1],margin:+m[2],min:+m[1]-+m[2],max:+m[1]+ +m[2],kind:"tol",display:s};
+  if(m=s.match(/^(-?[\d.]+)$/))return {exact:+m[1],min:+m[1],max:+m[1],kind:"exact",display:s};
+  return {error:true,display:s};
+}
+function parseQuiz(text){
+  const lines=text.replace(/\r\n/g,"\n").split("\n");
+  let title="",description="";const questions=[];let cur=null;
+  const flush=()=>{if(cur){finalize(cur);questions.push(cur);cur=null;}};
+  for(let li=0;li<lines.length;li++){
+    const raw=lines[li],line=raw.trim();let m;
+    if(m=raw.match(/^\s*Quiz title:\s*(.*)$/i)){title=m[1].trim();continue;}
+    if(m=raw.match(/^\s*Quiz description:\s*(.*)$/i)){description=m[1].trim();continue;}
+    if(m=raw.match(/^\s*(\d+)[.)]\s+(.*)$/)){flush();cur={num:+m[1],text:m[2].trim(),opts:[],answers:[],numeric:null,essay:false,file:false,type:null};continue;}
+    if(!cur||line==="")continue;
+    if(m=line.match(/^\[(\*|x|X|\s|)\]\s*(.*)$/)){cur.opts.push({text:m[2].trim(),correct:(m[1].trim().toLowerCase()==="*"||m[1].trim().toLowerCase()==="x")});cur._bracket=true;continue;}
+    if(m=line.match(/^(\*?)\s*([a-zA-Z])[.)]\s*(.*)$/)){cur.opts.push({text:m[3].trim(),correct:m[1]==="*",letter:m[2].toLowerCase()});cur._letter=true;continue;}
+    if(m=line.match(/^=\s*(.*)$/)){cur.numeric=m[1].trim();cur._num=true;continue;}
+    if(/^_{4,}$/.test(line)){cur.essay=true;continue;}
+    if(/^\^{4,}$/.test(line)){cur.file=true;continue;}
+    if(m=line.match(/^\*\s+(.*)$/)){cur.answers.push(m[1].trim());cur._short=true;continue;}
+    cur.text+=" "+line;
+  }
+  flush();
+  return {title,description,questions};
+}
+function finalize(q){
+  if(q._bracket)q.type="multiple_answers";
+  else if(q._num)q.type="numerical";
+  else if(q._letter){const tf=new Set(["waar","onwaar","true","false","juist","onjuist"]);q.type=(q.opts.length===2&&q.opts.every(o=>tf.has(o.text.toLowerCase())))?"true_false":"multiple_choice";}
+  else if(q.essay)q.type="essay";
+  else if(q.file)q.type="file_upload";
+  else if(q._short)q.type="short_answer";
+  else q.type="unknown";
+}
+function validate(quiz){
+  const issues=[];
+  quiz.questions.forEach((q,i)=>{
+    const tag=`Vraag ${i+1}`;q._valid=true;
+    const bad=m=>{issues.push({lvl:"err",msg:m});q._valid=false;};const warn=m=>issues.push({lvl:"warn",msg:m});
+    if(q.type==="unknown"){bad(`${tag}: geen geldig antwoordtype herkend.`);return;}
+    if(q.type==="multiple_choice"||q.type==="true_false"){
+      const c=q.opts.filter(o=>o.correct).length;
+      if(c===0)bad(`${tag}: geen correct antwoord gemarkeerd met *.`);
+      else if(c>1)warn(`${tag}: meerdere antwoorden gemarkeerd — alleen het eerste telt.`);
+      if(q.opts.length<2)warn(`${tag}: minder dan 2 antwoordopties.`);
+    }
+    if(q.type==="multiple_answers"&&!q.opts.some(o=>o.correct))bad(`${tag}: geen [*] correct antwoord gemarkeerd.`);
+    if(q.type==="short_answer"&&q.answers.length===0)bad(`${tag}: geen geaccepteerd antwoord (* ...).`);
+    if(q.type==="numerical"&&parseNumeric(q.numeric).error)bad(`${tag}: numeriek antwoord onleesbaar (\u201c${q.numeric}\u201d).`);
+  });
+  return issues;
+}
+
+/* QTI generation */
+let _idc=0;function nid(p){_idc++;return p+_idc+"x"+Math.random().toString(36).slice(2,7);}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function escX(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function matHtml(t){return `<material><mattext texttype="text/html">${escX("<p>"+esc(t)+"</p>")}</mattext></material>`;}
+function matPlain(t){return `<material><mattext texttype="text/plain">${escX(t)}</mattext></material>`;}
+const OUTCOMES=`<outcomes><decvar maxvalue="100" minvalue="0" varname="SCORE" vartype="Decimal"/></outcomes>`;
+function metaItem(qtype,extra){let f=`<qtimetadatafield><fieldlabel>question_type</fieldlabel><fieldentry>${qtype}</fieldentry></qtimetadatafield><qtimetadatafield><fieldlabel>points_possible</fieldlabel><fieldentry>1.0</fieldentry></qtimetadatafield>`;if(extra)f+=extra;return `<itemmetadata><qtimetadata>${f}</qtimetadata></itemmetadata>`;}
+function buildItem(q,idx){
+  const itemId=nid("i"),R="response1",title=`Question ${idx+1}`;
+  if(q.type==="multiple_choice"||q.type==="true_false"){
+    const ans=q.opts.map(o=>({id:nid("a"),text:o.text,correct:o.correct}));const correct=ans.find(a=>a.correct)||ans[0];
+    const qtype=q.type==="true_false"?"true_false_question":"multiple_choice_question";
+    const labels=ans.map(a=>`<response_label ident="${a.id}">${matPlain(a.text)}</response_label>`).join("");
+    return `<item ident="${itemId}" title="${escX(title)}">${metaItem(qtype,`<qtimetadatafield><fieldlabel>original_answer_ids</fieldlabel><fieldentry>${ans.map(a=>a.id).join(",")}</fieldentry></qtimetadatafield>`)}<presentation>${matHtml(q.text)}<response_lid ident="${R}" rcardinality="Single"><render_choice>${labels}</render_choice></response_lid></presentation><resprocessing>${OUTCOMES}<respcondition continue="No"><conditionvar><varequal respident="${R}">${correct.id}</varequal></conditionvar><setvar action="Set" varname="SCORE">100</setvar></respcondition></resprocessing></item>`;
+  }
+  if(q.type==="multiple_answers"){
+    const ans=q.opts.map(o=>({id:nid("a"),text:o.text,correct:o.correct}));
+    const labels=ans.map(a=>`<response_label ident="${a.id}">${matPlain(a.text)}</response_label>`).join("");
+    const cond=ans.map(a=>a.correct?`<varequal respident="${R}">${a.id}</varequal>`:`<not><varequal respident="${R}">${a.id}</varequal></not>`).join("");
+    return `<item ident="${itemId}" title="${escX(title)}">${metaItem("multiple_answers_question",`<qtimetadatafield><fieldlabel>original_answer_ids</fieldlabel><fieldentry>${ans.map(a=>a.id).join(",")}</fieldentry></qtimetadatafield>`)}<presentation>${matHtml(q.text)}<response_lid ident="${R}" rcardinality="Multiple"><render_choice>${labels}</render_choice></response_lid></presentation><resprocessing>${OUTCOMES}<respcondition continue="No"><conditionvar><and>${cond}</and></conditionvar><setvar action="Set" varname="SCORE">100</setvar></respcondition></resprocessing></item>`;
+  }
+  if(q.type==="short_answer"){
+    const conds=q.answers.map(a=>`<respcondition continue="No"><conditionvar><varequal respident="${R}">${escX(a)}</varequal></conditionvar><setvar action="Set" varname="SCORE">100</setvar></respcondition>`).join("");
+    return `<item ident="${itemId}" title="${escX(title)}">${metaItem("short_answer_question")}<presentation>${matHtml(q.text)}<response_str ident="${R}" rcardinality="Single"><render_fib><response_label ident="${nid("a")}"/></render_fib></response_str></presentation><resprocessing>${OUTCOMES}${conds}</resprocessing></item>`;
+  }
+  if(q.type==="numerical"){
+    const n=parseNumeric(q.numeric);let cond="";
+    if(!n.error){const parts=[];if(n.kind!=="range")parts.push(`<varequal respident="${R}">${n.exact}</varequal>`);parts.push(`<and><vargte respident="${R}">${n.min}</vargte><varlte respident="${R}">${n.max}</varlte></and>`);cond=`<or>${parts.join("")}</or>`;}else cond=`<other/>`;
+    return `<item ident="${itemId}" title="${escX(title)}">${metaItem("numerical_question")}<presentation>${matHtml(q.text)}<response_str ident="${R}" rcardinality="Single"><render_fib fibtype="Decimal"><response_label ident="${nid("a")}"/></render_fib></response_str></presentation><resprocessing>${OUTCOMES}<respcondition continue="No"><conditionvar>${cond}</conditionvar><setvar action="Set" varname="SCORE">100</setvar></respcondition></resprocessing></item>`;
+  }
+  const qtype=q.type==="file_upload"?"file_upload_question":"essay_question";
+  return `<item ident="${itemId}" title="${escX(title)}">${metaItem(qtype)}<presentation>${matHtml(q.text)}<response_str ident="${R}" rcardinality="Single"><render_fib><response_label ident="${nid("a")}"/></render_fib></response_str></presentation><resprocessing>${OUTCOMES}<respcondition continue="No"><conditionvar><other/></conditionvar></respcondition></resprocessing></item>`;
+}
+function buildAssessmentXML(quiz,aid){
+  const items=quiz.questions.map((q,i)=>buildItem(q,i)).join("");
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<questestinterop xmlns="http://www.imsglobal.org/xsd/ims_qtiasiv1p2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/ims_qtiasiv1p2 http://www.imsglobal.org/xsd/ims_qtiasiv1p2p1.xsd">
+  <assessment ident="${aid}" title="${escX(quiz.title||"Toets")}">
+    <qtimetadata><qtimetadatafield><fieldlabel>cc_maxattempts</fieldlabel><fieldentry>1</fieldentry></qtimetadatafield></qtimetadata>
+    <section ident="root_section">${items}</section>
+  </assessment>
+</questestinterop>`;
+}
+function buildMetaXML(quiz,aid){
+  const total=quiz.questions.length;const desc="<p>"+esc(quiz.description||"")+"</p>";
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<quiz identifier="${aid}" xmlns="http://canvas.instructure.com/xsd/cccv1p0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 https://canvas.instructure.com/xsd/cccv1p0.xsd">
+  <title>${escX(quiz.title||"Toets")}</title>
+  <description>${escX(desc)}</description>
+  <shuffle_answers>false</shuffle_answers>
+  <scoring_policy>keep_highest</scoring_policy>
+  <hide_results></hide_results>
+  <quiz_type>assignment</quiz_type>
+  <points_possible>${total}.0</points_possible>
+  <allowed_attempts>1</allowed_attempts>
+  <one_question_at_a_time>false</one_question_at_a_time>
+  <cant_go_back>false</cant_go_back>
+  <show_correct_answers>true</show_correct_answers>
+  <available>false</available>
+  <assignment identifier="${aid}_assignment">
+    <title>${escX(quiz.title||"Toets")}</title>
+    <due_at/><lock_at/><unlock_at/>
+    <workflow_state>unpublished</workflow_state>
+    <quiz_identifierref>${aid}</quiz_identifierref>
+    <points_possible>${total}.0</points_possible>
+    <grading_type>points</grading_type>
+    <submission_types>online_quiz</submission_types>
+    <position>1</position>
+  </assignment>
+  <assignment_group_identifierref>${aid}_ag</assignment_group_identifierref>
+</quiz>`;
+}
+function buildManifestXML(aid){
+  const manId=nid("M");
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<manifest identifier="${manId}" xmlns="http://www.imsglobal.org/xsd/imscp_v1p1" xmlns:lom="http://ltsc.ieee.org/xsd/imsccv1p1/LOM/resource" xmlns:imsmd="http://www.imsglobal.org/xsd/imsmd_v1p2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imscp_v1p1 http://www.imsglobal.org/xsd/imscp_v1p1.xsd http://www.imsglobal.org/xsd/imsmd_v1p2 http://www.imsglobal.org/xsd/imsmd_v1p2p2.xsd http://ltsc.ieee.org/xsd/imsccv1p1/LOM/resource http://www.imsglobal.org/profile/cc/ccv1p1/LOM/ccv1p1_lomresource_v1p0.xsd">
+  <metadata><schema>IMS Content</schema><schemaversion>1.1.3</schemaversion></metadata>
+  <organizations/>
+  <resources>
+    <resource identifier="${aid}" type="imsqti_xmlv1p2" href="${aid}/${aid}.xml"><file href="${aid}/${aid}.xml"/><dependency identifierref="${aid}_meta"/></resource>
+    <resource identifier="${aid}_meta" type="associatedcontent/imscc_xmlv1p1/learning-application-resource" href="${aid}/assessment_meta.xml"><file href="${aid}/assessment_meta.xml"/></resource>
+  </resources>
+</manifest>`;
+}
+function crc32(b){let c=0^(-1);for(let i=0;i<b.length;i++){let x=(c^b[i])&0xff;for(let k=0;k<8;k++)x=x&1?(0xEDB88320^(x>>>1)):(x>>>1);c=(c>>>8)^x;}return (c^(-1))>>>0;}
+function makeZip(files){
+  const enc=new TextEncoder(),u16=n=>[n&255,(n>>8)&255],u32=n=>[n&255,(n>>8)&255,(n>>16)&255,(n>>24)&255];
+  const local=[],central=[];let off=0;
+  files.forEach(f=>{
+    const name=enc.encode(f.name),data=enc.encode(f.data),crc=crc32(data),sz=data.length;
+    const lh=[].concat(u32(0x04034b50),u16(20),u16(0),u16(0),u16(0),u16(0),u32(crc),u32(sz),u32(sz),u16(name.length),u16(0));
+    const lb=new Uint8Array(lh.length+name.length+sz);lb.set(lh,0);lb.set(name,lh.length);lb.set(data,lh.length+name.length);local.push(lb);
+    const cd=[].concat(u32(0x02014b50),u16(20),u16(20),u16(0),u16(0),u16(0),u16(0),u32(crc),u32(sz),u32(sz),u16(name.length),u16(0),u16(0),u16(0),u16(0),u32(0),u32(off));
+    const cb=new Uint8Array(cd.length+name.length);cb.set(cd,0);cb.set(name,cd.length);central.push(cb);off+=lb.length;
+  });
+  const csize=central.reduce((a,c)=>a+c.length,0);
+  const eo=new Uint8Array([].concat(u32(0x06054b50),u16(0),u16(0),u16(files.length),u16(files.length),u32(csize),u32(off),u16(0)));
+  return new Blob([...local,...central,eo],{type:"application/zip"});
+}
+function slug(s){return (s||"toets").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,48)||"toets";}
+function serializeQuiz(quiz){
+  let s=`Quiz title: ${quiz.title||"Toets"}\nQuiz description: ${quiz.description||""}\n\n`;
+  quiz.questions.forEach((q,i)=>{
+    s+=`${i+1}. ${q.text}\n`;
+    if(q.type==="multiple_choice"||q.type==="true_false")q.opts.forEach((o,oi)=>s+=`${o.correct?"*":""}${String.fromCharCode(97+oi)}) ${o.text}\n`);
+    else if(q.type==="multiple_answers")q.opts.forEach(o=>s+=`[${o.correct?"*":" "}] ${o.text}\n`);
+    else if(q.type==="numerical")s+=`= ${q.numeric}\n`;
+    else if(q.type==="short_answer")q.answers.forEach(a=>s+=`* ${a}\n`);
+    else if(q.type==="essay")s+=`____\n`;
+    else if(q.type==="file_upload")s+=`^^^^\n`;
+    s+="\n";
+  });
+  return s.trimEnd()+"\n";
+}
+
+/* ====================== SMART NORMALIZER ======================
+   Zet vrije / rommelige opmaak om naar canonieke text2qti-opmaak.
+   Herkent o.a.: a) A) (a) a. letter-labels · - • ● ○ ◦ bullets ·
+   [x] [ ] [*] (x) ( ) checkboxes · ✓ ✔ √ ☑ vinkjes (vóór én achter) ·
+   * sterretje · **vet** · → => pijlen · (correct)/(juist)/(goed) labels ·
+   "Antwoord: C" / "Correct antwoord: b, d" sleutels · = numeriek · ____ essay · ^^^^ upload
+*/
+
+// Parse één antwoordregel: peel markers, onthoud wat we zagen.
+function nrmParseOption(line){
+  let s=line.replace(/\t/g," ").trim();
+  if(!s) return null;
+  const o={text:"",letter:null,
+    srcStar:false,srcCheckLead:false,srcArrow:false,srcFilled:false,srcEmptyBullet:false,
+    srcBracket:null,srcBold:false,srcTrailCorrect:false,srcTrailStar:false,
+    explicitIncorrect:false,starBullet:false,plainBullet:false,hadAnyMarker:false};
+  let changed=true,guard=0;
+  while(changed && guard++<12){
+    changed=false;let m;
+    // checkbox [x] [ ] [*] [v] [√]  /  (x) ( ) (*)
+    if(m=s.match(/^[\[(]\s*([xX*✓✔√vV]?)\s*[\])]/)){
+      const inner=(m[1]||"").trim().toLowerCase();
+      o.srcBracket = inner!=="" ? true : false;
+      if(inner==="") o.explicitIncorrect=true;
+      o.hadAnyMarker=true; s=s.slice(m[0].length).trimStart(); changed=true; continue;
+    }
+    // filled bullet (vaak = aangevinkt antwoord)
+    if(m=s.match(/^[●◉🔘⚫►▶➤]/u)){ o.srcFilled=true;o.hadAnyMarker=true; s=s.slice(m[0].length).trimStart(); changed=true; continue; }
+    // empty bullet
+    if(m=s.match(/^[○◯⚪◦∘⭕]/u)){ o.srcEmptyBullet=true;o.hadAnyMarker=true; s=s.slice(m[0].length).trimStart(); changed=true; continue; }
+    // leading vinkje
+    if(m=s.match(/^[✓✔√☑✅]/u)){ o.srcCheckLead=true;o.hadAnyMarker=true; s=s.slice(m[0].length).trimStart(); changed=true; continue; }
+    // leading kruisje (fout)
+    if(m=s.match(/^[✗✘☒❌]/u)){ o.explicitIncorrect=true;o.hadAnyMarker=true; s=s.slice(m[0].length).trimStart(); changed=true; continue; }
+    // pijl
+    if(m=s.match(/^(=>|->|=&gt;|-&gt;|→|➜|⇒|»)/)){ o.srcArrow=true;o.hadAnyMarker=true; s=s.slice(m[0].length).trimStart(); changed=true; continue; }
+    // * vlak vóór niet-spatie en niet-* (sterretje-marker, evt. gevolgd door letter)
+    if(m=s.match(/^\*(?=[^\s*])/)){ o.srcStar=true;o.hadAnyMarker=true; s=s.slice(1).trimStart(); changed=true; continue; }
+    // * met spatie = sterretje-bullet (text2qti short answer of decoratief)
+    if(m=s.match(/^\*\s+/)){ o.srcStar=true;o.starBullet=true;o.hadAnyMarker=true; s=s.slice(m[0].length); changed=true; continue; }
+    // gewone bullets - • – — ‣ ▪ · ◦
+    if(m=s.match(/^[-–—•‣▪·]\s+/)){ o.plainBullet=true;o.hadAnyMarker=true; s=s.slice(m[0].length); changed=true; continue; }
+    // letter-label: a) a. A) (a) (a. ) "a -"
+    if(m=s.match(/^\(?([A-Za-z])\)?\s*[.)\-–:]\s+/)){ o.letter=m[1].toLowerCase();o.hadAnyMarker=true; s=s.slice(m[0].length).trimStart(); changed=true; continue; }
+  }
+  // trailing labels (correct)/(juist)/(goed)/(waar)/(true)
+  let m2;
+  if(m2=s.match(/[\s]*[\[(]\s*(correcte?(?:\s*answer)?|juiste?|goede?|waar|true|right|✓|✔)\s*[\])][\s]*$/i)){ o.srcTrailCorrect=true;o.hadAnyMarker=true; s=s.slice(0,m2.index).trim(); }
+  else if(m2=s.match(/[\s]*[\[(]\s*(foute?|onjuiste?|incorrect|false|onwaar|wrong|✗|✘)\s*[\])][\s]*$/i)){ o.explicitIncorrect=true;o.hadAnyMarker=true; s=s.slice(0,m2.index).trim(); }
+  // trailing vinkje / sterretje / kruisje
+  if(m2=s.match(/\s*[✓✔√☑✅]\s*$/u)){ o.srcTrailCorrect=true;o.hadAnyMarker=true; s=s.replace(/\s*[✓✔√☑✅]\s*$/u,"").trim(); }
+  else if(m2=s.match(/\s*[✗✘☒❌]\s*$/u)){ o.explicitIncorrect=true;o.hadAnyMarker=true; s=s.replace(/\s*[✗✘☒❌]\s*$/u,"").trim(); }
+  else if(m2=s.match(/\s+\*\s*$/)){ o.srcTrailStar=true;o.hadAnyMarker=true; s=s.replace(/\s+\*\s*$/,"").trim(); }
+  // **vet** of __vet__ om de hele optie
+  if(m2=s.match(/^\*\*(.+?)\*\*$/)){ o.srcBold=true; s=m2[1].trim(); }
+  else if(m2=s.match(/^__(.+?)__$/)){ o.srcBold=true; s=m2[1].trim(); }
+  o.text=s.trim();
+  return o;
+}
+
+// Bepaal welke opties correct zijn (decoratieve markers eruit filteren).
+function nrmResolve(opts,answerKey){
+  const present=p=>opts.some(p), all=p=>opts.length>0&&opts.every(p);
+  // marker is decoratief als hij op ALLE opties staat
+  const decStar   = all(o=>o.srcStar);
+  const decCheck  = all(o=>o.srcCheckLead);
+  const decArrow  = all(o=>o.srcArrow);
+  const decBold   = all(o=>o.srcBold);
+  const decTrail  = all(o=>o.srcTrailCorrect||o.srcTrailStar);
+  const decFilled = all(o=>o.srcFilled);            // alle gevuld → geen info
+  const hasContrastBullet = present(o=>o.srcFilled)&&present(o=>o.srcEmptyBullet);
+  for(const o of opts){
+    let yes=false;
+    if(o.srcBracket===true) yes=true;
+    if(o.srcStar      && !decStar)   yes=true;
+    if(o.srcCheckLead && !decCheck)  yes=true;
+    if(o.srcArrow     && !decArrow)  yes=true;
+    if(o.srcBold      && !decBold)   yes=true;
+    if((o.srcTrailCorrect||o.srcTrailStar) && !decTrail) yes=true;
+    if(o.srcFilled && (!decFilled || hasContrastBullet)) yes=true;
+    o.correctFinal=yes;
+  }
+  // Antwoordsleutel als nog niets gemarkeerd is
+  if(!opts.some(o=>o.correctFinal) && answerKey){
+    const key=answerKey.trim();
+    const toks=key.split(/[\s,;/&]+|(?:\sen\s)|(?:\sof\s)/i).map(t=>t&&t.trim()).filter(Boolean);
+    const allLetters=toks.length>0 && toks.every(t=>/^[a-z]$/i.test(t));
+    if(allLetters){
+      const set=new Set(toks.map(t=>t.toLowerCase()));
+      opts.forEach((o,i)=>{ const lab=o.letter||String.fromCharCode(97+i); if(set.has(lab)) o.correctFinal=true; });
+    }else{
+      const norm=x=>x.toLowerCase().replace(/\s+/g," ").trim();
+      const want=norm(key); let hit=false;
+      opts.forEach(o=>{ if(norm(o.text)===want){o.correctFinal=true;hit=true;} });
+      if(!hit) opts.forEach(o=>{ if(norm(o.text)&&(norm(o.text)===want)){o.correctFinal=true;} });
+    }
+  }
+  return opts.filter(o=>o.correctFinal).length;
+}
+
+function nrmIsQuestionStart(raw){
+  let m;
+  if(m=raw.match(/^\s*(?:vraag|opgave|question|q)\s*(\d+)\s*[.):\-–]?\s*(.*)$/i)) return {num:+m[1],text:(m[2]||"").trim()};
+  if(m=raw.match(/^\s*(\d+)\s*[.)]\s+(.*\S)\s*$/))                                   return {num:+m[1],text:m[2].trim()};
+  return null;
+}
+function nrmAnswerKey(line){
+  let m;
+  if(m=line.match(/^\s*(?:het\s+)?(?:correcte?|juiste?|goede?|right|correct)?\s*antwoord(?:en)?\s*[:=\-]\s*(.+)$/i)) return m[1].trim();
+  if(m=line.match(/^\s*(?:correct\s*answer|answer|key|oplossing)\s*[:=\-]\s*(.+)$/i)) return m[1].trim();
+  return null;
+}
+function nrmNumericClean(v){
+  v=v.trim().replace(/±/g,"+-");
+  // komma-decimaal -> punt, maar niet in een [a,b] bereik
+  if(!/[\[\]]/.test(v)) v=v.replace(/(\d),(\d)/g,"$1.$2");
+  return v;
+}
+function nrmLooksNumeric(v){
+  v=nrmNumericClean(v);
+  return /^-?\d/.test(v) && /^[-\d.\s+\[\],]+$/.test(v.replace(/\+-/g,""));
+}
+// Scheidingslijn / sierlijn: regel met alleen herhaalde streep-/sier-tekens (geen letters/cijfers).
+function nrmIsDivider(line){
+  const s=line.trim();
+  return s.length>=3 && /^[_\-=*~·•–—.\s]+$/.test(s) && /[_\-=*~·•–—]/.test(s) && !/[A-Za-z0-9]/.test(s);
+}
+// Sectiekop herkennen (bepaalt standaardtype voor vragen zonder markering eronder).
+function nrmSectionType(s){
+  if(/essay|open\s*vrag|open\s*antwoord|lange?\s*vrag|toelicht|motiveer|beschrijf/i.test(s)) return "essay";
+  if(/bestand|upload/i.test(s)) return "file";
+  if(/meerkeuze|multiple\s*choice|gesloten\s*vrag/i.test(s)) return "mc";
+  return null;
+}
+
+function normalizeText(raw){
+  if(!raw||!raw.trim()) return "";
+  const lines=raw.replace(/\r\n?/g,"\n").split("\n");
+  let title="",description="";
+  const body=[];
+  for(const ln of lines){
+    let m;
+    if(m=ln.match(/^\s*(?:quiz\s*title|titel|toets(?:titel)?|title)\s*:\s*(.+)$/i)){ if(!title)title=m[1].trim(); continue; }
+    if(m=ln.match(/^\s*(?:quiz\s*description|beschrijving|omschrijving|description)\s*:\s*(.+)$/i)){ if(!description)description=m[1].trim(); continue; }
+    body.push(ln);
+  }
+  // ---- groepeer in vragen ----
+  const qs=[]; let cur=null,sawBlank=false,section=null;
+  const open=t=>{ cur={textParts:t?[t]:[],opts:[],numeric:null,essay:false,file:false,answerKey:null,section:section}; qs.push(cur); };
+  // vooruitkijken: wat is de volgende betekenisvolle regel?
+  const lookahead=(start)=>{
+    for(let j=start;j<body.length;j++){
+      const L=body[j].trim();
+      if(L===""||nrmIsDivider(L)) continue;
+      if(nrmIsQuestionStart(body[j])) return "q";
+      const op=nrmParseOption(body[j]);
+      if(op && op.hadAnyMarker) return "o";
+      return "other";
+    }
+    return "end";
+  };
+  for(let i=0;i<body.length;i++){
+    const raw1=body[i], line=raw1.trim();
+    if(line===""){ sawBlank=true; continue; }
+    const q=nrmIsQuestionStart(raw1);
+    const o=(!q)?nrmParseOption(raw1):null;
+    // bestandsupload-markering ^^^^
+    if(/^\^{3,}$/.test(line)){ if(cur && cur.opts.length===0 && !cur.numeric){ cur.file=true; } sawBlank=false; continue; }
+    // underscore-regel: kort (≤10) zonder opties = essay-vak, anders scheidingslijn
+    if(/^_{3,}$/.test(line)){
+      if(cur && cur.opts.length===0 && !cur.numeric && !cur.essay && !cur.file && line.length<=10){ cur.essay=true; }
+      sawBlank=false; continue; // lang = scheidingslijn → negeren
+    }
+    // overige scheidings-/sierlijnen → negeren
+    if(nrmIsDivider(line)){ sawBlank=false; continue; }
+    // expliciete essay/upload-labels
+    if(cur && cur.opts.length===0 && /^\s*\(?\s*(essay|open\s*vraag|lang\s*antwoord)\s*\)?\s*$/i.test(line)){ cur.essay=true; sawBlank=false; continue; }
+    if(cur && cur.opts.length===0 && /^\s*\(?\s*(bestand(?:supload)?|upload|file\s*upload)\s*\)?\s*$/i.test(line)){ cur.file=true; sawBlank=false; continue; }
+    // numeriek = ...
+    if(cur){ const mm=line.match(/^=\s*(.+)$/); if(mm){ cur.numeric=nrmNumericClean(mm[1]); sawBlank=false; continue; } }
+    // antwoordsleutel
+    if(cur){ const ak=nrmAnswerKey(line); if(ak!==null){ cur.answerKey=ak; sawBlank=false; continue; } }
+    // nieuwe genummerde vraag
+    if(q){ open(q.text); sawBlank=false; continue; }
+    // antwoordoptie
+    if(cur && o && o.hadAnyMarker && cur.textParts.join(" ").trim()!==""){ cur.opts.push(o); sawBlank=false; continue; }
+    // kopregel? (geen vraagteken, niet te lang, en wordt direct gevolgd door een vraag)
+    const looksHeader = !/\?\s*$/.test(line) && line.length<=90 && lookahead(i+1)==="q" &&
+                        (cur===null || cur.opts.length>0 || cur.numeric || cur.essay || cur.file || sawBlank);
+    if(looksHeader){ if(!title) title=line.replace(/\s*[:：]\s*$/,"").trim(); section=nrmSectionType(line); sawBlank=false; continue; }
+    // vervolg op vraagtekst, of nieuwe vraag zonder nummer
+    if(cur && cur.opts.length===0 && !cur.essay && !cur.file && !cur.numeric && !sawBlank){
+      cur.textParts.push(line);
+    }else{
+      open(line);
+    }
+    sawBlank=false;
+  }
+  // ---- emit canoniek ----
+  let out="Quiz title: "+(title||"Toets")+"\n";
+  out+="Quiz description: "+(description||"")+"\n\n";
+  let n=0;
+  for(const q of qs){
+    const qtext=q.textParts.join(" ").replace(/\s+/g," ").trim();
+    if(!qtext && q.opts.length===0 && !q.numeric && !q.essay && !q.file) continue;
+    n++;
+    out+=n+". "+qtext+"\n";
+    if(q.essay){ out+="____\n\n"; continue; }
+    if(q.file){ out+="^^^^\n\n"; continue; }
+    if(q.opts.length>0){
+      const correctCount=nrmResolve(q.opts,q.answerKey);
+      const usedBracket=q.opts.some(o=>o.srcBracket!==null);
+      const noMarkerNoKey=correctCount===0 && !q.answerKey &&
+        q.opts.every(o=>!o.letter && (o.starBullet||o.plainBullet)) ;
+      if(noMarkerNoKey){
+        // ongemarkeerde lijst zonder sleutel: behandel als open antwoord (alle = goed)
+        q.opts.forEach(o=>{ if(o.text) out+="* "+o.text+"\n"; });
+      }else if(usedBracket || correctCount>1){
+        q.opts.forEach(o=>{ out+="["+(o.correctFinal?"*":" ")+"] "+o.text+"\n"; });
+      }else{
+        q.opts.forEach((o,i)=>{ out+=(o.correctFinal?"*":"")+String.fromCharCode(97+i)+") "+o.text+"\n"; });
+      }
+      out+="\n"; continue;
+    }
+    // geen opties
+    if(q.numeric){ out+="= "+q.numeric+"\n\n"; continue; }
+    if(q.answerKey!==null){
+      if(nrmLooksNumeric(q.answerKey)){ out+="= "+nrmNumericClean(q.answerKey)+"\n\n"; continue; }
+      const variants=q.answerKey.split(/\s*[\/;]\s*|\s+of\s+/i).map(s=>s.trim()).filter(Boolean);
+      (variants.length?variants:[q.answerKey.trim()]).forEach(v=>out+="* "+v+"\n");
+      out+="\n"; continue;
+    }
+    // geen opties, geen sleutel: gebruik sectie-context
+    if(q.section==="essay"){ out+="____\n\n"; continue; }
+    if(q.section==="file"){ out+="^^^^\n\n"; continue; }
+    // niets herkend: laat leeg (validator markeert dit)
+    out+="\n";
+  }
+  return out.trimEnd()+"\n";
+}
+
+
+const $=s=>document.querySelector(s);
+const src=$("#src"),resBody=$("#resBody"),vBadge=$("#vBadge");
+const state={quiz:null,normalized:null};
+let smartOn=true;
+
+function typeCountsStr(quiz){
+  const c={};quiz.questions.forEach(q=>c[q.type]=(c[q.type]||0)+1);
+  return Object.keys(c).map(t=>`<span class="typetag" style="background:${TYPE_COLOR[t][0]};color:${TYPE_COLOR[t][1]}">${TYPE_LABEL[t]} ${c[t]}</span>`).join("");
+}
+let t=null;
+function onInput(){ clearTimeout(t); t=setTimeout(render,140); const n=src.value.trim()?src.value.split(/\n/).length:0; $("#srcStat").textContent=src.value.trim()?`${n} regels`:""; }
+function render(){
+  const text=src.value;
+  if(!text.trim()){ state.quiz=null; state.normalized=null; vBadge.className="vbadge"; showEmpty(); return; }
+  let parseText=text;
+  if(smartOn){
+    const normalized=normalizeText(text);
+    parseText=normalized;
+    // alleen het paneel tonen als de opmaak echt is aangepast
+    state.normalized = (normalized.trim()!==text.trim()) ? normalized : null;
+  }else state.normalized=null;
+  const quiz=parseQuiz(parseText); const issues=validate(quiz); state.quiz=quiz;
+  const errs=issues.filter(i=>i.lvl==="err").length;
+  if(quiz.questions.length){ vBadge.className="vbadge "+(errs?"bad":"ok"); vBadge.innerHTML=errs?`✕ ${errs} aandachtspunt${errs>1?"en":""}`:`✓ klaar voor Canvas`; }
+  else vBadge.className="vbadge";
+  renderResult(quiz,issues);
+}
+function showEmpty(){
+  resBody.innerHTML=`<div class="empty">
+    <div class="ill">✦</div>
+    <h3>Hier verschijnt je toets</h3>
+    <p>Plak links je vragen in de Canvas-opmaak. Je ziet ze meteen netjes terug, inclusief controle — daarna download je het QTI-bestand.</p>
+    <button class="demo-b" id="emptyEx">📋 Laad een voorbeeld</button>
+  </div>`;
+  $("#emptyEx").addEventListener("click",()=>loadExample("gemengd"));
+}
+function renderResult(quiz,issues){
+  let html="";
+  if(state.normalized){
+    html+=`<details class="cleaned"><summary><span class="tw">▸</span> 🪄 Zo heb ik je tekst gelezen — opgeschoonde opmaak</summary><div class="cb"><pre>${esc(state.normalized)}</pre><div class="crow"><button class="cbtn prim" id="useClean">✓ Gebruik deze opgeschoonde tekst</button><button class="cbtn" id="copyClean">⧉ Kopieer</button></div></div></details>`;
+  }
+  if(quiz.title) html+=`<div class="qtitle">${esc(quiz.title)}</div>`;
+  if(quiz.description) html+=`<div class="qdesc">${esc(quiz.description)}</div>`;
+  html+=`<div class="ov-meta"><span class="tcount">${quiz.questions.length} ${quiz.questions.length===1?"vraag":"vragen"}</span>${typeCountsStr(quiz)}</div>`;
+  const probs=issues.filter(i=>i.lvl==="err"||i.lvl==="warn");
+  const hasErr=issues.some(i=>i.lvl==="err");
+  if(probs.length){
+    html+=`<div class="warns ${hasErr?"errs":""}"><div class="wh">${hasErr?"Nakijken voor import":"Tips"}</div>`+probs.map(p=>`<div class="warnline ${p.lvl}">${p.lvl==="err"?"✕":"!"}&nbsp;<span>${esc(p.msg)}</span></div>`).join("")+`</div>`;
+  }
+  if(!quiz.questions.length){
+    html+=`<div class="ansline" style="background:var(--paper-2)"><span class="val" style="color:var(--ink-soft);font-weight:500">Nog geen vragen herkend — controleer de opmaak (zie 📑 Opmaakregels).</span></div>`;
+  }
+  quiz.questions.forEach((q,i)=>{
+    const [bg,fg]=TYPE_COLOR[q.type]||TYPE_COLOR.unknown;
+    html+=`<div class="qc ${q._valid?"":"invalid"}" style="animation-delay:${Math.min(i*35,350)}ms">
+      <div class="qc-h"><span class="qn">${i+1}</span><span class="qtype" style="background:${bg};color:${fg}">${TYPE_LABEL[q.type]}</span><span class="qstatus ${q._valid?"ok":"bad"}">${q._valid?"✓":"✕ nakijken"}</span></div>
+      <div class="qc-b"><div class="qtext">${esc(q.text)||'<span style="color:var(--red)">(geen vraagtekst)</span>'}</div>`;
+    if(q.type==="multiple_choice"||q.type==="true_false"){
+      html+=`<ul class="opts">`+q.opts.map(o=>`<li class="radio ${o.correct?"cor":""}"><span class="ob">✓</span>${esc(o.text)}</li>`).join("")+`</ul>`;
+    }else if(q.type==="multiple_answers"){
+      html+=`<ul class="opts">`+q.opts.map(o=>`<li class="${o.correct?"cor":""}"><span class="ob">✓</span>${esc(o.text)}</li>`).join("")+`</ul>`;
+    }else if(q.type==="numerical"){
+      const n=parseNumeric(q.numeric);
+      html+=`<div class="ansline"><span class="lbl">Antwoord</span><span class="val">${n.error?'<span style="color:var(--red)">onleesbaar</span>':n.kind==="range"?`tussen ${n.min} en ${n.max}`:n.kind==="tol"?`${n.exact} (± ${n.margin})`:`${n.exact}`}</span></div>`;
+    }else if(q.type==="short_answer"){
+      html+=`<div class="ansline"><span class="lbl">Goed</span><span class="val">${q.answers.map(esc).join("  ·  ")}</span></div>`;
+    }else if(q.type==="essay"){
+      html+=`<div class="ansline muted"><span class="lbl">✎</span><span class="val">Open essay-antwoord · handmatig nakijken</span></div>`;
+    }else if(q.type==="file_upload"){
+      html+=`<div class="ansline muted"><span class="lbl">⬆</span><span class="val">Bestandsupload · handmatig nakijken</span></div>`;
+    }else{
+      html+=`<div class="ansline" style="background:var(--red-soft)"><span class="val" style="color:var(--red)">Geen antwoordformaat herkend</span></div>`;
+    }
+    html+=`</div></div>`;
+  });
+  const ready=quiz.questions.length>0;
+  html+=`<div class="export">
+    <h3>📦 Exporteren naar Canvas</h3>
+    <p>Download het QTI-bestand (1 punt per vraag) of de nette text2qti-tekst.</p>
+    <div class="row">
+      <button class="dl-zip" id="dlZip" ${ready?"":"disabled"}>⬇ Download QTI-zip</button>
+      <button class="dl-txt" id="dlTxt" ${ready?"":"disabled"}>⬇ Nette .txt</button>
+    </div>
+    <details class="howto"><summary><span class="tw">▸</span> Hoe importeer ik dit in Canvas?</summary>
+      <ol>
+        <li>Open je cursus → <code>Instellingen</code> (Settings).</li>
+        <li>Klik rechts op <code>Cursusinhoud importeren</code> (Import Course Content).</li>
+        <li>Inhoudstype: kies <code>QTI .zip-bestand</code>.</li>
+        <li>Selecteer het gedownloade bestand en klik <code>Importeren</code>.</li>
+        <li>De vragen verschijnen als nieuwe toets / in een vragenbank.</li>
+      </ol>
+    </details>
+  </div>`;
+  resBody.innerHTML=html;
+  if(state.normalized){
+    const uc=$("#useClean"), cc=$("#copyClean");
+    if(uc) uc.addEventListener("click",()=>{
+      src.value=state.normalized; smartOn=false; $("#smartTog").checked=false;
+      onInput(); render(); toast("Opgeschoonde tekst overgenomen","ok");
+    });
+    if(cc) cc.addEventListener("click",()=>{
+      navigator.clipboard.writeText(state.normalized).then(()=>toast("Gekopieerd","ok")).catch(()=>toast("Kopiëren lukte niet","bad"));
+    });
+  }
+  if(ready){ $("#dlZip").addEventListener("click",buildAndDownload); $("#dlTxt").addEventListener("click",downloadTxt); }
+}
+function buildAndDownload(){
+  const quiz=state.quiz; if(!quiz||!quiz.questions.length){ toast("Geen vragen om te exporteren","bad"); return; }
+  _idc=0; const aid=nid("g")+"quiz";
+  const zip=makeZip([
+    {name:"imsmanifest.xml",data:buildManifestXML(aid)},
+    {name:`${aid}/${aid}.xml`,data:buildAssessmentXML(quiz,aid)},
+    {name:`${aid}/assessment_meta.xml`,data:buildMetaXML(quiz,aid)}
+  ]);
+  const a=document.createElement("a");a.href=URL.createObjectURL(zip);a.download=`${slug(quiz.title)}-qti.zip`;a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+  toast("QTI-zip gedownload","ok");
+}
+function downloadTxt(){
+  const quiz=state.quiz; if(!quiz||!quiz.questions.length) return;
+  const blob=new Blob([serializeQuiz(quiz)],{type:"text/plain"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`${slug(quiz.title)}.txt`;a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+  toast("Nette tekst gedownload","ok");
+}
+function loadExample(k){ src.value=EXAMPLES[k]; onInput(); render(); $("#exMenu").classList.remove("show"); toast("Voorbeeld geladen","ok"); }
+
+/* wiring */
+src.addEventListener("input",onInput);
+$("#clearBtn").addEventListener("click",()=>{ src.value=""; onInput(); render(); src.focus(); });
+$("#exBtn").addEventListener("click",e=>{ e.stopPropagation(); $("#exMenu").classList.toggle("show"); });
+$("#exMenu").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>loadExample(b.dataset.ex)));
+document.addEventListener("click",e=>{ if(!e.target.closest(".ex-wrap")) $("#exMenu").classList.remove("show"); });
+
+/* smart toggle */
+$("#smartTog").addEventListener("change",e=>{ smartOn=e.target.checked; render(); toast(smartOn?"Slimme herkenning aan":"Slimme herkenning uit","ok"); });
+
+/* rules modal */
+$("#rulesPre").textContent=RULES;
+function openRules(){ $("#rulesMask").classList.add("show"); }
+$("#rulesBtn").addEventListener("click",openRules);
+$("#rulesBtn2").addEventListener("click",openRules);
+$("#rulesBtn3").addEventListener("click",openRules);
+$("#rulesX").addEventListener("click",()=>$("#rulesMask").classList.remove("show"));
+$("#rulesMask").addEventListener("mousedown",e=>{ if(e.target===$("#rulesMask")) $("#rulesMask").classList.remove("show"); });
+$("#rulesCopy").addEventListener("click",()=>{ navigator.clipboard.writeText(RULES).then(()=>toast("Regels gekopieerd","ok")).catch(()=>toast("Kopiëren lukte niet","bad")); });
+
+/* AI prompt modal */
+$("#aiPromptBox").textContent=AI_PROMPT;
+function openAI(){ $("#aiMask").classList.add("show"); }
+$("#aiBtn").addEventListener("click",openAI);
+$("#aiBtn2").addEventListener("click",openAI);
+$("#aiX").addEventListener("click",()=>$("#aiMask").classList.remove("show"));
+$("#aiMask").addEventListener("mousedown",e=>{ if(e.target===$("#aiMask")) $("#aiMask").classList.remove("show"); });
+$("#aiCopy").addEventListener("click",()=>{ navigator.clipboard.writeText(AI_PROMPT).then(()=>toast("Prompt gekopieerd","ok")).catch(()=>toast("Kopiëren lukte niet","bad")); });
+
+/* video uitleg modal — voeg hier nieuwe video's toe (id = het stukje na youtu.be/) */
+const VIDEOS=[
+  {id:"9fEUe-SkXW4", title:"Introductie · zo werkt de toetsgenerator"},
+  {id:"qmiRstl-tY0", title:"Vragen opmaken & importeren in Canvas"}
+];
+function renderVideos(){
+  const wrap=$("#vidGrid"); if(!wrap) return;
+  wrap.innerHTML=VIDEOS.map(v=>`
+    <div class="vid-card">
+      <button class="vid-thumb" type="button" data-yt="${v.id}" aria-label="Speel video af: ${esc(v.title)}" style="background-image:url('https://i.ytimg.com/vi/${v.id}/hqdefault.jpg')"><span class="vid-play">▶</span></button>
+      <div class="vid-meta">
+        <span class="vid-title">${esc(v.title)}</span>
+        <a class="vid-link" href="https://youtu.be/${v.id}" target="_blank" rel="noopener">↗ openen op YouTube</a>
+      </div>
+    </div>`).join("");
+  wrap.querySelectorAll(".vid-thumb").forEach(b=>b.addEventListener("click",()=>{
+    const f=document.createElement("iframe");
+    f.className="vid-frame";
+    f.src=`https://www.youtube-nocookie.com/embed/${b.dataset.yt}?autoplay=1&rel=0`;
+    f.title="YouTube-video";
+    f.setAttribute("allow","accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share");
+    f.setAttribute("allowfullscreen","");
+    b.replaceWith(f);
+  }));
+}
+function openVid(){ renderVideos(); $("#vidMask").classList.add("show"); }
+function closeVid(){ $("#vidMask").classList.remove("show"); const g=$("#vidGrid"); if(g) g.innerHTML=""; }
+$("#vidBtn").addEventListener("click",openVid);
+$("#vidX").addEventListener("click",closeVid);
+$("#vidMask").addEventListener("mousedown",e=>{ if(e.target===$("#vidMask")) closeVid(); });
+
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ $("#rulesMask").classList.remove("show"); $("#aiMask").classList.remove("show"); closeVid(); } });
+
+/* toast */
+let toastT=null;
+function toast(msg,kind){ const el=$("#toast"); el.innerHTML=(kind==="bad"?'<span style="color:#ff9aa8">✕</span>':'<span class="tk">✓</span>')+esc(msg); el.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove("show"),2600); }
+
+/* init */
+showEmpty();
+</script>
+</body>
+</html>
